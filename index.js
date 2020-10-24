@@ -9,12 +9,14 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 const port = process.env.PORT || 4040;
+const url = "mongodb+srv://crmApp:crmAppPassword@crmapp.7nzwk.mongodb.net/<dbname>?retryWrites=true&w=majority"
+const jwtTK = "t8Mp4P1e+ZKJKWLNPfQ8oDKMv4BiIJwDGW8M43YcVstVGI98zi6LV0WGAIHLUqWO+M+EKtZ0rup0wDLUqZJ/R75etvKbg68xLNtv6B2flRWluBJjMYwxme7VNl/+izcz1gE98tEPRUtzpXvB0p+mgACDQV9sup3/WDfkBH0TVlk=";
 
 
 function authorize(req, res, next) {
   try {
     if (req.headers.auth !== undefined) {
-      let jwtmessage = jwt.verify(req.headers.auth, process.env.JWTTK);
+      let jwtmessage = jwt.verify(req.headers.auth, jwtTK);
       res.locals.user = jwtmessage.user;
       next();
     } else {
@@ -34,7 +36,7 @@ app.get("/dashboard", [authorize], async (req, res) => {
   var user = req.body;
   try {
     // do something ....
-    const client = await mongodb.connect(process.env.DBURL);
+    const client = await mongodb.connect(url);
     const db = client.db("crm");
     var [service, leads, contacts] = await Promise.all([
       db.collection("service").find().toArray(),
@@ -50,7 +52,7 @@ app.get("/dashboard", [authorize], async (req, res) => {
 app.put("/service", [authorize], async (req, res) => {
   try {
     var reqData = req.body;
-    const client = await mongodb.connect(process.env.DBURL);
+    const client = await mongodb.connect(url);
     var db = client.db("crm");
     console.log(res.locals.user);
     var data = await db
@@ -108,7 +110,7 @@ app.put("/service", [authorize], async (req, res) => {
 
 app.get("/service", [authorize], async (req, res) => {
   try {
-    const client = await mongodb.connect(process.env.DBURL);
+    const client = await mongodb.connect(url);
     const db = client.db("crm");
     console.log(res.locals.user);
     var data = await db
@@ -138,7 +140,7 @@ app.get("/service", [authorize], async (req, res) => {
 app.post("/service", [authorize], async (req, res) => {
   try {
     var reqData = req.body;
-    const client = await mongodb.connect(process.env.DBURL);
+    const client = await mongodb.connect(url);
     var db = client.db("crm");
     console.log(res.locals.user);
     var data = await db
@@ -190,7 +192,7 @@ app.post("/service", [authorize], async (req, res) => {
 app.put("/leads", [authorize], async (req, res) => {
   try {
     var reqData = req.body;
-    const client = await mongodb.connect(process.env.DBURL);
+    const client = await mongodb.connect(url);
     var db = client.db("crm");
     console.log(res.locals.user);
     var data = await db
@@ -249,7 +251,7 @@ app.put("/leads", [authorize], async (req, res) => {
 app.post("/leads", [authorize], async (req, res) => {
   try {
     var reqData = req.body;
-    const client = await mongodb.connect(process.env.DBURL);
+    const client = await mongodb.connect(url);
     var db = client.db("crm");
     console.log(res.locals.user);
     var data = await db
@@ -300,7 +302,7 @@ app.post("/leads", [authorize], async (req, res) => {
 
 app.get("/leads", [authorize], async (req, res) => {
   try {
-    const client = await mongodb.connect(process.env.DBURL);
+    const client = await mongodb.connect(url);
     const db = client.db("crm");
     console.log(res.locals.user);
     var data = await db
@@ -330,7 +332,7 @@ app.get("/leads", [authorize], async (req, res) => {
 app.post("/access", [authorize], async (req, res) => {
   console.log(req.body);
   try {
-    const client = await mongodb.connect(process.env.DBURL, {
+    const client = await mongodb.connect(url, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
@@ -361,7 +363,7 @@ app.post("/access", [authorize], async (req, res) => {
 
 app.get("/access", [authorize], async (req, res) => {
   try {
-    const client = await mongodb.connect(process.env.DBURL);
+    const client = await mongodb.connect(url);
     const db = client.db("crm");
     var data = await db
       .collection("users")
@@ -389,7 +391,7 @@ app.get("/access", [authorize], async (req, res) => {
 
 app.get("/contact", [authorize], async (req, res) => {
   try {
-    const client = await mongodb.connect(process.env.DBURL);
+    const client = await mongodb.connect(url);
     const db = client.db("crm");
     console.log(res.locals.user);
     var data = await db
@@ -415,7 +417,7 @@ app.get("/contact", [authorize], async (req, res) => {
 
 app.post("/contact", [authorize], async (req, res) => {
   try {
-    const client = await mongodb.connect(process.env.DBURL);
+    const client = await mongodb.connect(url);
     const db = client.db("crm");
     var data = await db
       .collection("users")
@@ -442,7 +444,7 @@ app.post("/contact", [authorize], async (req, res) => {
 app.post("/signin", async (req, res) => {
   var user = req.body;
   try {
-    const client = await mongodb.connect(process.env.DBURL, { useUnifiedTopology: true });
+    const client = await mongodb.connect(url, { useUnifiedTopology: true });
     const db = client.db("crm");
     var data = await db.collection("users").findOne({ email: user.email });
     if (data === null) {
@@ -453,7 +455,7 @@ app.post("/signin", async (req, res) => {
     if (result) {
       const { _id, email } = data;
       delete data.password;
-      let jwtToken = jwt.sign({  id: _id, email: email }, process.env.JWTTK, {
+      let jwtToken = jwt.sign({  id: _id, email: email }, jwtTK, {
         expiresIn: "1h",
       });
       res.json({ message: "success", user: data, jwtToken: jwtToken });
@@ -476,7 +478,7 @@ app.post("/signup", async (req, res) => {
   }
   user.isEmailVerified = false;
   try {
-    const client = await mongodb.connect(process.env.DBURL, { useUnifiedTopology: true });
+    const client = await mongodb.connect(url, { useUnifiedTopology: true });
     const db = client.db("crm");
     const data = await db
       .collection("users")
@@ -494,7 +496,7 @@ app.post("/signup", async (req, res) => {
   var hash = await bcrypt.hash(user.password, 10);
   user.password = hash;
   try {
-    const client = await mongodb.connect(process.env.DBURL);
+    const client = await mongodb.connect(url);
     const db = client.db("crm");
     const data = await db.collection("users").insertOne(user);
     await client.close();
