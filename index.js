@@ -5,10 +5,11 @@ const mongodb = require("mongodb");
 const cors = require("cors");
 const bcrypt = require("bcrypt");
 var jwt = require("jsonwebtoken");
-const port = process.env.PORT || 4040;
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
+const port = process.env.PORT || 4040;
+
 
 function authorize(req, res, next) {
   try {
@@ -441,7 +442,7 @@ app.post("/contact", [authorize], async (req, res) => {
 app.post("/signin", async (req, res) => {
   var user = req.body;
   try {
-    const client = await mongodb.connect(process.env.DBURL);
+    const client = await mongodb.connect(process.env.DBURL, { useUnifiedTopology: true });
     const db = client.db("crm");
     var data = await db.collection("users").findOne({ email: user.email });
     if (data === null) {
@@ -450,8 +451,9 @@ app.post("/signin", async (req, res) => {
     }
     const result = await bcrypt.compare(user.password, data.password);
     if (result) {
+      const { _id, email } = data;
       delete data.password;
-      let jwtToken = jwt.sign({ user: data }, process.env.JWTTK, {
+      let jwtToken = jwt.sign({  id: _id, email: email }, process.env.JWTTK, {
         expiresIn: "1h",
       });
       res.json({ message: "success", user: data, jwtToken: jwtToken });
@@ -474,7 +476,7 @@ app.post("/signup", async (req, res) => {
   }
   user.isEmailVerified = false;
   try {
-    const client = await mongodb.connect(process.env.DBURL);
+    const client = await mongodb.connect(process.env.DBURL, { useUnifiedTopology: true });
     const db = client.db("crm");
     const data = await db
       .collection("users")
