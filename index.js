@@ -456,9 +456,9 @@ app.post("/signin", async (req, res) => {
     }
     const result = await bcrypt.compare(user.password, data.password);
     if (result) {
-      const { _id, email } = data;
+      // const { _id, email } = data;
       delete data.password;
-      let jwtToken = jwt.sign({  id: _id, email: email }, jwtTK, {
+      let jwtToken = jwt.sign({user : data}, jwtTK, {
         expiresIn: "1h",
       });
       res.json({ message: "success", user: data, jwtToken: jwtToken });
