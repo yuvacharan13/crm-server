@@ -106,7 +106,7 @@ app.put("/service", [authorize], async (req, res) => {
     }
   } catch (err) {
     console.log(err);
-    res.json({message : err});
+    // res.json({message : err});
     return;
   }
 });
@@ -135,7 +135,7 @@ app.get("/service", [authorize], async (req, res) => {
     }
   } catch (err) {
     console.log(err);
-    res.json({message : err});
+    // res.json({message : err});
     return;
   }
 });
@@ -187,7 +187,7 @@ app.post("/service", [authorize], async (req, res) => {
     }
   } catch (err) {
     console.log(err);
-    res.json({message : err});
+    // res.json({message : err});
     return;
   }
 });
