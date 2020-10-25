@@ -46,7 +46,10 @@ app.get("/dashboard", [authorize], async (req, res) => {
     console.log(service.length, leads.length, contacts.length);
 
     res.json({ message: "success", service, leads, contacts });
-  } catch (err) {}
+  } catch (err) {
+    console.log(err);
+    res.json({message : err});
+  }
 });
 
 app.put("/service", [authorize], async (req, res) => {
@@ -103,7 +106,7 @@ app.put("/service", [authorize], async (req, res) => {
     }
   } catch (err) {
     console.log(err);
-    res.status(404).json({ message: "failed" });
+    res.json({message : err});
     return;
   }
 });
@@ -132,7 +135,7 @@ app.get("/service", [authorize], async (req, res) => {
     }
   } catch (err) {
     console.log(err);
-    res.status(404).json({ message: "failed" });
+    res.json({message : err});
     return;
   }
 });
@@ -184,7 +187,7 @@ app.post("/service", [authorize], async (req, res) => {
     }
   } catch (err) {
     console.log(err);
-    res.status(404).json({ message: "failed" });
+    res.json({message : err});
     return;
   }
 });
