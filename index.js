@@ -10,8 +10,8 @@ app.use(cors());
 app.use(bodyParser.json());
 const port = process.env.PORT || 4040;
 
-const url = process.env.DBURL;
-const CrmToken = process.env.CRMToken;
+const url = "mongodb+srv://crmApp:crmAppPassword@crmapp.7nzwk.mongodb.net/<dbname>?retryWrites=true&w=majority";
+const CrmToken = "t8Mp4P1e+ZKJKWLNPfQ8oDKMv4BiIJwDGW8M43YcVstVGI98zi6LV0WGAIHLUqWO+M+EKtZ0rup0wDLUqZJ/R75etvKbg68xLNtv6B2flRWluBJjMYwxme7VNl/+izcz1gE98tEPRUtzpXvB0p+mgACDQV9sup3/WDfkBH0TVlk=";
 
 function authorize(req, res, next) {
   try {
