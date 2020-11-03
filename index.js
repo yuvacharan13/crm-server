@@ -9,14 +9,14 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 const port = process.env.PORT || 4040;
-const url = "mongodb+srv://crmApp:crmAppPassword@crmapp.7nzwk.mongodb.net/<dbname>?retryWrites=true&w=majority"
-const jwtTK = "t8Mp4P1e+ZKJKWLNPfQ8oDKMv4BiIJwDGW8M43YcVstVGI98zi6LV0WGAIHLUqWO+M+EKtZ0rup0wDLUqZJ/R75etvKbg68xLNtv6B2flRWluBJjMYwxme7VNl/+izcz1gE98tEPRUtzpXvB0p+mgACDQV9sup3/WDfkBH0TVlk=";
 
+const url = processe.env.URL;
+const CrmToken = process.env.CRMToken;
 
 function authorize(req, res, next) {
   try {
     if (req.headers.auth !== undefined) {
-      let jwtmessage = jwt.verify(req.headers.auth, jwtTK);
+      let jwtmessage = jwt.verify(req.headers.auth, CrmToken);
       res.locals.user = jwtmessage.user;
       next();
     } else {
@@ -36,7 +36,7 @@ app.get("/dashboard", [authorize], async (req, res) => {
   var user = req.body;
   try {
     // do something ....
-    const client = await mongodb.connect(url);
+    const client = await mongodb.connect(url, { useUnifiedTopology: true });
     const db = client.db("crm");
     var [service, leads, contacts] = await Promise.all([
       db.collection("service").find().toArray(),
@@ -55,7 +55,7 @@ app.get("/dashboard", [authorize], async (req, res) => {
 app.put("/service", [authorize], async (req, res) => {
   try {
     var reqData = req.body;
-    const client = await mongodb.connect(url);
+    const client = await mongodb.connect(url, { useUnifiedTopology: true });
     var db = client.db("crm");
     console.log(res.locals.user);
     var data = await db
@@ -113,7 +113,7 @@ app.put("/service", [authorize], async (req, res) => {
 
 app.get("/service", [authorize], async (req, res) => {
   try {
-    const client = await mongodb.connect(url);
+    const client = await mongodb.connect(url, { useUnifiedTopology: true });
     const db = client.db("crm");
     console.log(res.locals.user);
     var data = await db
@@ -143,7 +143,7 @@ app.get("/service", [authorize], async (req, res) => {
 app.post("/service", [authorize], async (req, res) => {
   try {
     var reqData = req.body;
-    const client = await mongodb.connect(url);
+    const client = await mongodb.connect(url, { useUnifiedTopology: true });
     var db = client.db("crm");
     console.log(res.locals.user);
     var data = await db
@@ -195,7 +195,7 @@ app.post("/service", [authorize], async (req, res) => {
 app.put("/leads", [authorize], async (req, res) => {
   try {
     var reqData = req.body;
-    const client = await mongodb.connect(url);
+    const client = await mongodb.connect(url, { useUnifiedTopology: true });
     var db = client.db("crm");
     console.log(res.locals.user);
     var data = await db
@@ -254,7 +254,7 @@ app.put("/leads", [authorize], async (req, res) => {
 app.post("/leads", [authorize], async (req, res) => {
   try {
     var reqData = req.body;
-    const client = await mongodb.connect(url);
+    const client = await mongodb.connect(url, { useUnifiedTopology: true });
     var db = client.db("crm");
     console.log(res.locals.user);
     var data = await db
@@ -305,7 +305,7 @@ app.post("/leads", [authorize], async (req, res) => {
 
 app.get("/leads", [authorize], async (req, res) => {
   try {
-    const client = await mongodb.connect(url);
+    const client = await mongodb.connect(url, { useUnifiedTopology: true });
     const db = client.db("crm");
     console.log(res.locals.user);
     var data = await db
@@ -366,7 +366,7 @@ app.post("/access", [authorize], async (req, res) => {
 
 app.get("/access", [authorize], async (req, res) => {
   try {
-    const client = await mongodb.connect(url);
+    const client = await mongodb.connect(url, { useUnifiedTopology: true });
     const db = client.db("crm");
     var data = await db
       .collection("users")
@@ -394,7 +394,7 @@ app.get("/access", [authorize], async (req, res) => {
 
 app.get("/contact", [authorize], async (req, res) => {
   try {
-    const client = await mongodb.connect(url);
+    const client = await mongodb.connect(url, { useUnifiedTopology: true });
     const db = client.db("crm");
     console.log(res.locals.user);
     var data = await db
@@ -420,7 +420,7 @@ app.get("/contact", [authorize], async (req, res) => {
 
 app.post("/contact", [authorize], async (req, res) => {
   try {
-    const client = await mongodb.connect(url);
+    const client = await mongodb.connect(url, { useUnifiedTopology: true });
     const db = client.db("crm");
     var data = await db
       .collection("users")
@@ -456,11 +456,8 @@ app.post("/signin", async (req, res) => {
     }
     const result = await bcrypt.compare(user.password, data.password);
     if (result) {
-      // const { _id, email } = data;
       delete data.password;
-      let jwtToken = jwt.sign({user : data}, jwtTK, {
-        expiresIn: "1h",
-      });
+      let jwtToken = jwt.sign({user : data}, CrmToken);
       res.json({ message: "success", user: data, jwtToken: jwtToken });
     } else {
       res.json({ message: "Password not matching" });
@@ -499,7 +496,7 @@ app.post("/signup", async (req, res) => {
   var hash = await bcrypt.hash(user.password, 10);
   user.password = hash;
   try {
-    const client = await mongodb.connect(url);
+    const client = await mongodb.connect(url, { useUnifiedTopology: true });
     const db = client.db("crm");
     const data = await db.collection("users").insertOne(user);
     await client.close();
