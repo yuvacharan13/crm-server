@@ -10,7 +10,7 @@ app.use(cors());
 app.use(bodyParser.json());
 const port = process.env.PORT || 4040;
 
-const url = processe.env.URL;
+const url = process.env.URL;
 const CrmToken = process.env.CRMToken;
 
 function authorize(req, res, next) {
