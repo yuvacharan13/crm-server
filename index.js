@@ -181,7 +181,7 @@ app.post("/service", [authorize], async (req, res) => {
         return;
       }
     } else {
-      res.status(404).json({ message: "failed" });
+      res.json({message : err});
       await client.close();
       return;
     }
@@ -464,7 +464,7 @@ app.post("/signin", async (req, res) => {
     }
   } catch (err) {
     console.log(err);
-    res.json({ message: "failed" });
+    res.json({ message: err });
     return;
   }
 });
